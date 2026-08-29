@@ -1,0 +1,225 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Three-Way Match Engine API",
+    "version": "1.0.0",
+    "description": "REST API documentation for Three-Way Matching between Purchase Orders (PO), Goods Receipt Notes (GRN), and Invoices with Gemini OCR and SKU Master resolution."
+  },
+  "servers": [
+    {
+      "url": "http://localhost:5000",
+      "description": "Local Development Server"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "Static Token"
+      }
+    }
+  },
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "paths": {
+    "/health": {
+      "get": {
+        "summary": "Health check — returns server status and timestamp",
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "Server is healthy",
+            "content": {
+              "application/json": {
+                "example": {
+                  "status": "ok",
+                  "timestamp": "2026-08-29T15:00:00.000Z",
+                  "service": "three-way-match-engine-backend"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "summary": "Authenticate user and get static bearer token",
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "username": { "type": "string", "example": "admin" },
+                  "password": { "type": "string", "example": "admin123" }
+                },
+                "required": ["username", "password"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Login successful" },
+          "400": { "description": "Missing credentials" }
+        }
+      }
+    },
+    "/documents/upload": {
+      "post": {
+        "summary": "Upload and parse PO, GRN or Invoice document",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "file": { "type": "string", "format": "binary" },
+                  "documentType": { "type": "string", "enum": ["po", "grn", "invoice"], "example": "po" },
+                  "parsedData": { "type": "string", "description": "Optional pre-parsed JSON override" }
+                },
+                "required": ["documentType"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Document parsed and saved" },
+          "400": { "description": "Invalid input or parse failure" }
+        }
+      }
+    },
+    "/documents": {
+      "get": {
+        "summary": "List documents filtered by type and/or poNumber",
+        "parameters": [
+          { "name": "type", "in": "query", "schema": { "type": "string", "enum": ["po", "grn", "invoice"] } },
+          { "name": "poNumber", "in": "query", "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "List of documents" }
+        }
+      }
+    },
+    "/documents/{id}": {
+      "get": {
+        "summary": "Get document by ID",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Document details" },
+          "404": { "description": "Document not found" }
+        }
+      }
+    },
+    "/documents/{id}/file": {
+      "get": {
+        "summary": "Stream or download original document file",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "File binary stream" }
+        }
+      }
+    },
+    "/match/{poNumber}": {
+      "get": {
+        "summary": "Run dynamic Three-Way Match computation for a PO",
+        "parameters": [
+          { "name": "poNumber", "in": "path", "required": true, "schema": { "type": "string" }, "example": "CI4PO05788" }
+        ],
+        "responses": {
+          "200": { "description": "Match result with status and item-level details" }
+        }
+      }
+    },
+    "/summary/{poNumber}": {
+      "get": {
+        "summary": "Get executive summary statistics and linked documents for a PO",
+        "parameters": [
+          { "name": "poNumber", "in": "path", "required": true, "schema": { "type": "string" }, "example": "CI4PO05788" }
+        ],
+        "responses": {
+          "200": { "description": "Summary metrics" }
+        }
+      }
+    },
+    "/masters/sku": {
+      "get": {
+        "summary": "List SKU Master catalog",
+        "parameters": [
+          { "name": "search", "in": "query", "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "List of SKUs" }
+        }
+      },
+      "post": {
+        "summary": "Create a new SKU Master record",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "skuErpCode": { "type": "string", "example": "SKU-TEST-01" },
+                  "name": { "type": "string", "example": "Test Item" },
+                  "eanCode": { "type": "string", "example": "8901030383793" },
+                  "hsnCode": { "type": "string", "example": "33051090" },
+                  "uom": { "type": "string", "example": "NOS" },
+                  "agreedRate": { "type": "number", "example": 100.0 },
+                  "mrp": { "type": "number", "example": 120.0 },
+                  "priceTolerance": { "type": "number", "example": 0.05 }
+                },
+                "required": ["skuErpCode", "name"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "SKU created" }
+        }
+      }
+    },
+    "/masters/sku/{id}": {
+      "patch": {
+        "summary": "Update an existing SKU Master record",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "SKU updated" }
+        }
+      },
+      "delete": {
+        "summary": "Delete a SKU Master record",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "SKU deleted" }
+        }
+      }
+    }
+  }
+}

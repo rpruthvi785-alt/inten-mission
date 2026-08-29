@@ -1,0 +1,26 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-slate-50 text-slate-900 antialiased;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+}
+
+.badge-matched {
+  @apply bg-emerald-50 text-emerald-700 border border-emerald-200;
+}
+
+.badge-partially_matched {
+  @apply bg-amber-50 text-amber-700 border border-amber-200;
+}
+
+.badge-mismatch {
+  @apply bg-rose-50 text-rose-700 border border-rose-200;
+}
+
+.badge-insufficient_documents {
+  @apply bg-blue-50 text-blue-700 border border-blue-200;
+}
