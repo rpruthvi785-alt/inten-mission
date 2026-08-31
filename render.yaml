@@ -1,0 +1,24 @@
+services:
+  - type: web
+    name: inten-mission
+    runtime: node
+    plan: free
+    rootDir: backend
+    buildCommand: npm install
+    startCommand: node src/server.js
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 5000
+      - key: AUTH_TOKEN
+        value: demo-static-token
+      - key: ALLOWED_ORIGINS
+        value: https://rpruthvi785-alt.github.io
+      - key: QTY_TOLERANCE
+        value: "2"
+      - key: MRP_TOLERANCE_PERCENT
+        value: "1.0"
+      - key: INVOICE_DATE_AFTER_PO_ALLOWED
+        value: "true"

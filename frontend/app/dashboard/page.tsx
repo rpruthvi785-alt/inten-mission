@@ -108,24 +108,24 @@ export default function DashboardPage() {
       />
 
       {/* Main Content Area */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-1 w-full">
+      <main className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6 flex-1 w-full overflow-x-hidden">
         {/* PO Header Bar */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 pb-4 border-b border-slate-200">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 mb-4 sm:mb-6 pb-3 sm:pb-4 border-b border-slate-200">
           <div>
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Purchase Order:</span>
-              <span className="font-mono font-bold text-slate-900 text-lg">{poNumber || 'N/A'}</span>
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="text-[11px] sm:text-xs font-semibold text-slate-500 uppercase tracking-wider">Purchase Order:</span>
+              <span className="font-mono font-bold text-slate-900 text-base sm:text-lg">{poNumber || 'N/A'}</span>
             </div>
-            <p className="text-xs text-slate-500 mt-0.5">
+            <p className="text-[11px] sm:text-xs text-slate-500 mt-0.5 truncate max-w-sm sm:max-w-md">
               Vendor: <strong className="text-slate-700">{currentPoDoc?.vendorName || 'Hindustan Consumer Supplies Ltd'}</strong>
             </p>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
             <button
               onClick={handleRefreshAll}
               disabled={isMatchRefetching}
-              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-700 bg-white hover:bg-slate-100 border border-slate-200 rounded-lg shadow-xs transition-all"
+              className="flex items-center justify-center gap-1.5 px-3 py-2 sm:py-1.5 text-xs font-medium text-slate-700 bg-white hover:bg-slate-50 active:bg-slate-100 border border-slate-200 rounded-xl shadow-xs transition-all w-full sm:w-auto min-h-[38px] sm:min-h-[32px]"
             >
               <RefreshCw className={`w-3.5 h-3.5 ${isMatchRefetching ? 'animate-spin text-indigo-600' : 'text-slate-500'}`} />
               <span>Recompute Match</span>
@@ -149,11 +149,18 @@ export default function DashboardPage() {
         {isMatchLoading ? (
           <div className="h-64 flex flex-col items-center justify-center text-slate-400 gap-2">
             <Loader2 className="w-8 h-8 animate-spin text-indigo-600" />
-            <p className="text-sm font-medium">Recomputing Three-Way Match...</p>
+            <p className="text-xs sm:text-sm font-medium">Recomputing Three-Way Match...</p>
           </div>
         ) : matchError ? (
-          <div className="bg-rose-50 border border-rose-200 rounded-lg p-6 text-center text-rose-700 text-sm">
-            Failed to load match result: {(matchError as any).message}
+          <div className="bg-rose-50 border border-rose-200 rounded-xl p-5 text-center text-rose-700 text-xs sm:text-sm shadow-xs">
+            <p className="font-bold mb-1">Failed to load match result</p>
+            <p className="text-rose-600">{(matchError as any).message}</p>
+            <button
+              onClick={handleRefreshAll}
+              className="mt-3 px-4 py-1.5 bg-rose-600 text-white font-medium rounded-lg text-xs hover:bg-rose-700 transition-colors"
+            >
+              Retry Loading
+            </button>
           </div>
         ) : (
           <>

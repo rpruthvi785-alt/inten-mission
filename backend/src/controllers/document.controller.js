@@ -179,7 +179,14 @@ const getDocuments = async (req, res, next) => {
     const results = {};
 
     const filter = {};
-    if (poNumber) filter.poNumber = poNumber.trim();
+    if (poNumber) {
+      const clean = poNumber.trim();
+      const pattern = clean.replace(/[0oO]/g, '[0oO]');
+      filter.$or = [
+        { poNumber: clean },
+        { poNumber: { $regex: new RegExp(`^${pattern}$`, 'i') } }
+      ];
+    }
 
     if (!type || type === 'po') {
       results.pos = await PurchaseOrder.find(filter).populate('items.skuMaster').sort({ createdAt: -1 });

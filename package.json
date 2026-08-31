@@ -1,0 +1,14 @@
+{
+  "name": "three-way-match-engine-root",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Root runner for Three-Way Match Engine",
+  "scripts": {
+    "postinstall": "cd backend && npm install",
+    "build": "cd backend && npm install",
+    "start": "cd backend && npm start"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

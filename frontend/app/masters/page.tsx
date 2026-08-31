@@ -65,43 +65,44 @@ export default function SkuMasterPage() {
         onOpenUpload={() => router.push('/dashboard')}
       />
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 w-full">
+      <main className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-8 flex-1 w-full">
         {/* Page Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-          <div className="flex items-center gap-3">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 mb-4 sm:mb-6">
+          <div className="flex items-center gap-2.5 sm:gap-3">
             <Link
               href="/dashboard"
-              className="p-2 text-slate-500 hover:text-slate-800 hover:bg-white rounded-lg border border-slate-200 transition-colors"
+              className="p-2 text-slate-500 hover:text-slate-800 hover:bg-white rounded-lg border border-slate-200 transition-colors shrink-0"
+              title="Return to Dashboard"
             >
               <ArrowLeft className="w-4 h-4" />
             </Link>
             <div>
-              <h1 className="text-xl font-bold text-slate-900 flex items-center gap-2">
-                <Database className="w-5 h-5 text-indigo-600" />
+              <h1 className="text-lg sm:text-xl font-bold text-slate-900 flex items-center gap-2">
+                <Database className="w-4 h-4 sm:w-5 sm:h-5 text-indigo-600 shrink-0" />
                 <span>SKU Master Catalog</span>
               </h1>
-              <p className="text-xs text-slate-500 mt-0.5">
+              <p className="text-[11px] sm:text-xs text-slate-500 mt-0.5">
                 Central ERP & EAN product mapping catalog with price tolerances
               </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
             {/* Search Input */}
-            <div className="relative w-64">
-              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+            <div className="relative w-full sm:w-60 lg:w-72">
+              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
               <input
                 type="text"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder="Search SKU / EAN / Name..."
-                className="w-full pl-9 pr-3 py-1.5 text-xs bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 font-mono"
+                className="w-full pl-9 pr-3 py-2 sm:py-1.5 text-xs bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 font-mono"
               />
             </div>
 
             <button
               onClick={handleCreate}
-              className="flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg shadow-sm transition-all"
+              className="flex items-center justify-center gap-1.5 px-3.5 py-2 sm:py-1.5 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 rounded-lg shadow-xs transition-all min-h-[38px] sm:min-h-[32px]"
             >
               <Plus className="w-4 h-4" />
               <span>Add SKU Master</span>
@@ -110,7 +111,11 @@ export default function SkuMasterPage() {
         </div>
 
         {/* SKU Catalog Table */}
-        <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+        <div className="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">
+          <div className="sm:hidden px-4 py-2 bg-slate-50 border-b border-slate-200 text-[10px] text-slate-500 flex items-center justify-between">
+            <span>Catalog Items</span>
+            <span className="text-indigo-600 font-medium">Swipe table horizontally →</span>
+          </div>
           {isLoading ? (
             <div className="h-64 flex flex-col items-center justify-center text-slate-400 gap-2">
               <Loader2 className="w-7 h-7 animate-spin text-indigo-600" />

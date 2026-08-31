@@ -20,11 +20,20 @@ async function matchPurchaseOrder(poNumber, customOptions = {}) {
   const cleanPoNumber = String(poNumber).trim();
   const config = { ...matchingConfig, ...customOptions };
 
+  // Support both CI4PO05788 (letter O) and CI4P005788 (number 0) and case-insensitive search
+  const normalizedPattern = cleanPoNumber.replace(/[0oO]/g, '[0oO]');
+  const poQuery = {
+    $or: [
+      { poNumber: cleanPoNumber },
+      { poNumber: { $regex: new RegExp(`^${normalizedPattern}$`, 'i') } }
+    ]
+  };
+
   // Load all documents from CURRENT database (never cached)
   const [poDocs, grnDocs, invoiceDocs] = await Promise.all([
-    PurchaseOrder.find({ poNumber: cleanPoNumber }).lean(),
-    Grn.find({ poNumber: cleanPoNumber }).lean(),
-    Invoice.find({ poNumber: cleanPoNumber }).lean(),
+    PurchaseOrder.find(poQuery).lean(),
+    Grn.find(poQuery).lean(),
+    Invoice.find(poQuery).lean(),
   ]);
 
   const globalReasons = new Set();
@@ -296,19 +305,39 @@ async function matchPurchaseOrder(poNumber, customOptions = {}) {
       }
     }
 
-    // B. Invoice vs GRN
+    // B. Invoice vs GRN (applies same configurable qtyTolerance as PO checks)
     if (hasGrn && entry.invoiceQty > entry.grnQty) {
       const excess = entry.invoiceQty - entry.grnQty;
-      itemReasons.add('invoice_qty_exceeds_grn_qty');
-      globalReasons.add('invoice_qty_exceeds_grn_qty');
-      hardViolations.add('invoice_qty_exceeds_grn_qty');
-      conflictsList.push({
-        code: 'invoice_qty_exceeds_grn_qty',
-        title: `Invoice Qty Exceeds GRN: ${entry.skuName || entry.sku}`,
-        description: `Invoiced ${entry.invoiceQty} units vs ${entry.grnQty} units received in GRN (Excess: +${excess} units).`,
-        resolution: 'Verify if remaining goods are in transit. If not received, request a credit note or invoice amendment.',
-        details: { sku: entry.sku, skuName: entry.skuName, grnQty: entry.grnQty, invoiceQty: entry.invoiceQty, excess },
-      });
+      if (excess > qtyTolerance) {
+        // Exceeds tolerance → Hard Conflict
+        itemReasons.add('invoice_qty_exceeds_grn_qty');
+        globalReasons.add('invoice_qty_exceeds_grn_qty');
+        hardViolations.add('invoice_qty_exceeds_grn_qty');
+        conflictsList.push({
+          code: 'invoice_qty_exceeds_grn_qty',
+          title: `Invoice Qty Exceeds GRN: ${entry.skuName || entry.sku}`,
+          description: `Invoiced ${entry.invoiceQty} units vs ${entry.grnQty} units received in GRN (Excess: +${excess} units exceeds tolerance of +${qtyTolerance}).`,
+          resolution: 'Verify if remaining goods are in transit. If not received, request a credit note or invoice amendment.',
+          details: { sku: entry.sku, skuName: entry.skuName, grnQty: entry.grnQty, invoiceQty: entry.invoiceQty, excess, tolerance: qtyTolerance },
+        });
+      } else {
+        // Within allowed tolerance → Accepted with Warning
+        softWarnings.add('quantity_within_tolerance');
+        const warnObj = {
+          code: 'quantity_within_tolerance',
+          sku: entry.sku,
+          skuName: entry.skuName,
+          poQty: entry.poQty,
+          grnQty: entry.grnQty,
+          invoiceQty: entry.invoiceQty,
+          variance: excess,
+          tolerance: qtyTolerance,
+          status: 'ACCEPTED_WITHIN_TOLERANCE',
+          message: `Invoiced quantity (+${excess} units) exceeds GRN received quantity but is within allowed tolerance (+${qtyTolerance} units).`,
+        };
+        itemWarnings.push(warnObj);
+        warningsList.push(warnObj);
+      }
     }
 
     // C. Invoice vs PO

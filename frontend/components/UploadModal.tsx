@@ -71,51 +71,53 @@ export const UploadModal: React.FC<UploadModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
-      <div className="bg-white rounded-xl shadow-2xl max-w-lg w-full overflow-hidden border border-slate-200">
+    <div className="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden border border-slate-200 my-auto max-h-[92vh] flex flex-col">
         {/* Modal Header */}
-        <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="p-2 bg-indigo-50 text-indigo-600 rounded-lg">
+        <div className="px-5 sm:px-6 py-4 border-b border-slate-100 flex items-center justify-between shrink-0">
+          <div className="flex items-center gap-2.5">
+            <div className="p-2 bg-indigo-50 text-indigo-600 rounded-xl">
               <UploadCloud className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="text-base font-bold text-slate-900">Upload Procurement Document</h3>
-              <p className="text-xs text-slate-500">Extracts data via Gemini OCR & auto-resolves SKUs</p>
+              <h3 className="text-sm sm:text-base font-bold text-slate-900">Upload Procurement Document</h3>
+              <p className="text-[11px] sm:text-xs text-slate-500">Extracts data via Gemini OCR & auto-resolves SKUs</p>
             </div>
           </div>
           <button
             onClick={handleClose}
             className="text-slate-400 hover:text-slate-600 p-1.5 rounded-lg hover:bg-slate-100 transition-colors"
+            aria-label="Close modal"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Modal Body */}
-        <form onSubmit={handleUpload} className="p-6 space-y-5">
+        <form onSubmit={handleUpload} className="p-4 sm:p-6 space-y-4 sm:space-y-5 overflow-y-auto flex-1">
           {/* Document Type Selector */}
           <div>
-            <label className="block text-xs font-semibold uppercase tracking-wider text-slate-700 mb-1.5">
+            <label className="block text-[11px] sm:text-xs font-semibold uppercase tracking-wider text-slate-700 mb-1.5">
               Document Type <span className="text-rose-500">*</span>
             </label>
-            <div className="grid grid-cols-3 gap-2">
+            <div className="grid grid-cols-3 gap-1.5 sm:gap-2">
               {[
-                { id: 'po', label: 'Purchase Order' },
-                { id: 'grn', label: 'GRN / Delivery' },
-                { id: 'invoice', label: 'Fulfillment Invoice' },
+                { id: 'po', label: 'Purchase Order', short: 'PO' },
+                { id: 'grn', label: 'GRN / Delivery', short: 'GRN' },
+                { id: 'invoice', label: 'Invoice', short: 'Invoice' },
               ].map((t) => (
                 <button
                   type="button"
                   key={t.id}
                   onClick={() => setDocumentType(t.id)}
-                  className={`py-2 px-3 text-xs font-medium rounded-lg border transition-all text-center ${
+                  className={`py-2 px-2 sm:px-3 text-xs font-medium rounded-xl border transition-all text-center min-h-[38px] ${
                     documentType === t.id
-                      ? 'border-indigo-600 bg-indigo-50 text-indigo-700 font-semibold'
+                      ? 'border-indigo-600 bg-indigo-50 text-indigo-700 font-bold shadow-2xs'
                       : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50'
                   }`}
                 >
-                  {t.label}
+                  <span className="hidden sm:inline">{t.label}</span>
+                  <span className="inline sm:hidden">{t.short}</span>
                 </button>
               ))}
             </div>
@@ -123,10 +125,10 @@ export const UploadModal: React.FC<UploadModalProps> = ({
 
           {/* File Picker */}
           <div>
-            <label className="block text-xs font-semibold uppercase tracking-wider text-slate-700 mb-1.5">
+            <label className="block text-[11px] sm:text-xs font-semibold uppercase tracking-wider text-slate-700 mb-1.5">
               Select Document File (PDF / Image) <span className="text-rose-500">*</span>
             </label>
-            <div className="border-2 border-dashed border-slate-300 rounded-xl p-6 text-center hover:border-indigo-400 transition-colors bg-slate-50/60">
+            <div className="border-2 border-dashed border-slate-300 rounded-xl p-4 sm:p-6 text-center hover:border-indigo-400 transition-colors bg-slate-50/60">
               <input
                 type="file"
                 id="file-upload"
@@ -135,12 +137,12 @@ export const UploadModal: React.FC<UploadModalProps> = ({
                 className="hidden"
               />
               <label htmlFor="file-upload" className="cursor-pointer flex flex-col items-center">
-                <FileCheck2 className="w-8 h-8 text-indigo-500 mb-2" />
-                <span className="text-sm font-medium text-slate-800">
+                <FileCheck2 className="w-7 h-7 sm:w-8 sm:h-8 text-indigo-500 mb-1.5" />
+                <span className="text-xs sm:text-sm font-medium text-slate-800 break-all px-2">
                   {file ? file.name : 'Click to choose or drag & drop document'}
                 </span>
-                <span className="text-xs text-slate-400 mt-1">
-                  Supported formats: PDF, PNG, JPG, JPEG, WEBP (Max 25MB)
+                <span className="text-[10px] sm:text-xs text-slate-400 mt-1">
+                  PDF, PNG, JPG, JPEG, WEBP (Max 25MB)
                 </span>
               </label>
             </div>

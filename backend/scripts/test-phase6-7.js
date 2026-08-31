@@ -1,4 +1,5 @@
 require('dotenv').config();
+const path = require('path');
 const mongoose = require('mongoose');
 const connectDB = require('../src/config/db');
 const {
@@ -217,7 +218,7 @@ async function runMatchingEngineTests() {
   const po12 = 'PO-012';
   await PurchaseOrder.create({ poNumber: po12, items: [{ itemCode: 'SKU-001', quantity: 15 }] });
   await Grn.create({ grnNumber: 'GRN-012', poNumber: po12, items: [{ itemCode: 'SKU-001', receivedQuantity: 10 }] });
-  await Invoice.create({ invoiceNumber: 'INV-012', poNumber: po12, items: [{ itemCode: 'SKU-001', quantity: 12 }] }); // exceeds GRN 10
+  await Invoice.create({ invoiceNumber: 'INV-012', poNumber: po12, items: [{ itemCode: 'SKU-001', quantity: 15 }] }); // exceeds GRN 10 by 5 (tolerance is 2)
   const res12 = await matchPurchaseOrder(po12);
   if (res12.status !== 'mismatch' || !res12.reasons.includes('invoice_qty_exceeds_grn_qty')) {
     throw new Error(`Test 12 Failed: Expected invoice_qty_exceeds_grn_qty`);
@@ -246,7 +247,7 @@ async function runMatchingEngineTests() {
   await PurchaseOrder.create({ poNumber: po14, poDate: new Date('2026-03-20'), items: [{ itemCode: 'SKU-001', quantity: 10 }] });
   await Grn.create({ grnNumber: 'GRN-014', poNumber: po14, items: [{ itemCode: 'SKU-001', receivedQuantity: 10 }] });
   await Invoice.create({ invoiceNumber: 'INV-014', poNumber: po14, invoiceDate: new Date('2026-03-25'), items: [{ itemCode: 'SKU-001', quantity: 10 }] });
-  const res14 = await matchPurchaseOrder(po14);
+  const res14 = await matchPurchaseOrder(po14, { invoiceDateAfterPoAllowed: false });
   if (!res14.reasons.includes('invoice_date_after_po_date')) {
     throw new Error(`Test 14 Failed: Expected invoice_date_after_po_date`);
   }
@@ -368,6 +369,15 @@ async function runMatchingEngineTests() {
     throw new Error(`Test 20 Failed: SKU was not dynamically resolved on recomputation. Got: ${res20After.status}`);
   }
   console.log('✓ Test 20 Passed: Dynamic recomputation resolved late-created SKU Master!');
+
+  // Restore the full real production dataset (CI4PO05788) so MongoDB is always ready
+  try {
+    const { execSync } = require('child_process');
+    execSync(`node "${path.join(__dirname, 'seed-real.js')}"`, { stdio: 'ignore' });
+    console.log('✓ Restored full production dataset (CI4PO05788) in MongoDB.');
+  } catch (err) {
+    console.warn('Could not auto-restore real dataset:', err.message);
+  }
 
   console.log('\n====================================================');
   console.log('ALL 20 MATCHING ENGINE TEST CASES PASSED SUCCESSFULLY!');

@@ -1,6 +1,5 @@
 /**
  * Pure Node.js Git Staging & Push Utility
- * Uses isomorphic-git to stage, commit, and push without requiring external git CLI.
  */
 const git = require('isomorphic-git');
 const http = require('isomorphic-git/http/node');
@@ -17,7 +16,7 @@ async function pushRepo() {
   const gitDir = path.join(rootDir, '.git');
   if (!fs.existsSync(gitDir)) {
     console.log('[Git Push] Initializing repository...');
-    await git.init({ fs, dir: rootDir });
+    await git.init({ fs, dir: rootDir, defaultBranch: 'main' });
   }
 
   // 2. Add remote
@@ -34,8 +33,7 @@ async function pushRepo() {
   }
 
   // 3. Scan and stage files
-  console.log('[Git Push] Scanning and staging files...');
-  const ignoreDirs = new Set(['node_modules', '.next', '.git', 'dist', 'build', '.system_generated', 'coverage']);
+  const ignoreDirs = new Set(['node_modules', '.next', '.git', 'dist', 'build', '.system_generated', 'coverage', '.gemini']);
   const ignoreFiles = new Set(['.env', '.env.local', '.env.production.local']);
 
   function getFiles(dir, base = '') {
@@ -82,8 +80,13 @@ async function pushRepo() {
     });
     console.log('[Git Push] Commit created:', sha);
   } catch (commitErr) {
-    console.log('[Git Push] Commit status:', commitErr.message);
+    console.log('[Git Push] Commit note:', commitErr.message);
   }
+
+  // Create main branch pointing to HEAD
+  try {
+    await git.branch({ fs, dir: rootDir, ref: 'main', checkout: true });
+  } catch (e) {}
 
   // 5. Push to GitHub
   console.log('[Git Push] Pushing to origin main...');
@@ -94,6 +97,7 @@ async function pushRepo() {
       dir: rootDir,
       remote: 'origin',
       ref: 'main',
+      remoteRef: 'main',
       force: true,
       onAuth: () => {
         const token = process.env.GITHUB_TOKEN || process.env.GH_TOKEN;
@@ -108,10 +112,6 @@ async function pushRepo() {
     console.log('✅ CODE SUCCESSFULLY PUSHED TO https://github.com/rpruthvi785-alt/inten-mission.git');
   } catch (pushErr) {
     console.error('[Git Push] Push error:', pushErr.message);
-    if (pushErr.message.includes('401') || pushErr.message.includes('403') || pushErr.message.includes('authentication') || pushErr.message.includes('credentials')) {
-      console.log('\n[Git Push Note] GitHub requires authentication to push to this repository.');
-      console.log('Provide a GitHub Personal Access Token (PAT) via environment variable GITHUB_TOKEN to complete authenticated push.');
-    }
   }
 }
 

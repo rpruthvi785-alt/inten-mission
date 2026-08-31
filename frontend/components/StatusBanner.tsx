@@ -82,12 +82,12 @@ export const StatusBanner: React.FC<StatusBannerProps> = ({
   // 1. MATCHED (Zero Conflicts, Zero Warnings)
   if (status === 'matched' && !hasWarnings) {
     return (
-      <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-5 mb-6 shadow-sm flex items-start gap-3.5">
-        <CheckCircle2 className="w-6 h-6 text-emerald-600 mt-0.5 flex-shrink-0" />
-        <div className="flex-1">
-          <div className="flex items-center gap-2">
-            <span className="font-bold text-emerald-950 text-base">Three-Way Match Successful</span>
-            <span className="bg-emerald-200 text-emerald-900 text-xs px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider">
+      <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-4 sm:p-5 mb-5 sm:mb-6 shadow-xs flex items-start gap-3 sm:gap-3.5">
+        <CheckCircle2 className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-600 mt-0.5 flex-shrink-0" />
+        <div className="flex-1 min-w-0">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="font-bold text-emerald-950 text-sm sm:text-base">Three-Way Match Successful</span>
+            <span className="bg-emerald-200 text-emerald-900 text-[10px] sm:text-xs px-2 sm:px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider whitespace-nowrap">
               MATCHED
             </span>
           </div>
@@ -95,8 +95,8 @@ export const StatusBanner: React.FC<StatusBannerProps> = ({
             Purchase Order #{poNumber}, linked GRN(s), and Invoice(s) quantities and rates fully reconcile with zero mismatches. Approved for payment processing.
           </p>
           {dateFlow && dateFlow.isValidChronological && (
-            <div className="mt-2.5 inline-flex items-center gap-1.5 bg-emerald-100/70 border border-emerald-300 text-emerald-900 text-[11px] font-medium px-2.5 py-1 rounded-md">
-              <Calendar className="w-3.5 h-3.5 text-emerald-700" />
+            <div className="mt-2.5 inline-flex items-center gap-1.5 bg-emerald-100/70 border border-emerald-300 text-emerald-900 text-[11px] font-medium px-2.5 py-1 rounded-lg flex-wrap">
+              <Calendar className="w-3.5 h-3.5 text-emerald-700 shrink-0" />
               <span>
                 <strong>Timeline:</strong> PO Date ({dateFlow.poDate}) → Invoice Date ({dateFlow.invoiceDate}) (+{dateFlow.differenceDays} days) — <em>✓ Valid chronological flow</em>
               </span>
@@ -110,13 +110,13 @@ export const StatusBanner: React.FC<StatusBannerProps> = ({
   // 2. MATCHED WITH WARNINGS (Within Tolerance, Zero Hard Conflicts)
   if ((status === 'partially_matched' || status === 'matched') && !hasHardConflicts) {
     return (
-      <div className="bg-emerald-50/90 border border-emerald-300 rounded-xl p-5 mb-6 shadow-sm">
-        <div className="flex items-start gap-3.5">
-          <CheckCircle2 className="w-6 h-6 text-emerald-600 mt-0.5 flex-shrink-0" />
-          <div className="flex-1">
-            <div className="flex items-center gap-2">
-              <span className="font-bold text-emerald-950 text-base">Three-Way Match Successful (Within Configured Tolerance)</span>
-              <span className="bg-emerald-200 text-emerald-900 text-xs px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider">
+      <div className="bg-emerald-50/90 border border-emerald-300 rounded-xl p-4 sm:p-5 mb-5 sm:mb-6 shadow-xs">
+        <div className="flex items-start gap-3 sm:gap-3.5">
+          <CheckCircle2 className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-600 mt-0.5 flex-shrink-0" />
+          <div className="flex-1 min-w-0">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="font-bold text-emerald-950 text-sm sm:text-base">Three-Way Match Successful (Within Tolerance)</span>
+              <span className="bg-emerald-200 text-emerald-900 text-[10px] sm:text-xs px-2 sm:px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider whitespace-nowrap">
                 {statusLabel || 'MATCHED WITH WARNINGS'}
               </span>
             </div>
@@ -188,13 +188,13 @@ export const StatusBanner: React.FC<StatusBannerProps> = ({
         });
 
     return (
-      <div className="bg-rose-50 border border-rose-300 rounded-xl p-5 mb-6 shadow-sm">
-        <div className="flex items-start gap-3.5">
-          <AlertCircle className="w-6 h-6 text-rose-600 mt-0.5 flex-shrink-0" />
-          <div className="flex-1">
-            <div className="flex items-center gap-2">
-              <span className="font-bold text-rose-950 text-base">Three-Way Match Conflict (Hard Mismatch)</span>
-              <span className="bg-rose-200 text-rose-900 text-xs px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider">
+      <div className="bg-rose-50 border border-rose-300 rounded-xl p-4 sm:p-5 mb-5 sm:mb-6 shadow-xs">
+        <div className="flex items-start gap-3 sm:gap-3.5">
+          <AlertCircle className="w-5 h-5 sm:w-6 sm:h-6 text-rose-600 mt-0.5 flex-shrink-0" />
+          <div className="flex-1 min-w-0">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="font-bold text-rose-950 text-sm sm:text-base">Three-Way Match Conflict (Hard Mismatch)</span>
+              <span className="bg-rose-200 text-rose-900 text-[10px] sm:text-xs px-2 sm:px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider whitespace-nowrap">
                 HARD MISMATCH
               </span>
             </div>
@@ -225,12 +225,12 @@ export const StatusBanner: React.FC<StatusBannerProps> = ({
 
   // 4. INSUFFICIENT DOCUMENTS
   return (
-    <div className="bg-blue-50 border border-blue-200 rounded-xl p-5 mb-6 shadow-sm flex items-start gap-3.5">
-      <Info className="w-6 h-6 text-blue-600 mt-0.5 flex-shrink-0" />
-      <div>
-        <div className="flex items-center gap-2">
-          <span className="font-bold text-blue-950 text-base">Awaiting Complete Document Set</span>
-          <span className="bg-blue-200 text-blue-900 text-xs px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider">
+    <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 sm:p-5 mb-5 sm:mb-6 shadow-xs flex items-start gap-3 sm:gap-3.5">
+      <Info className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600 mt-0.5 flex-shrink-0" />
+      <div className="min-w-0">
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="font-bold text-blue-950 text-sm sm:text-base">Awaiting Complete Document Set</span>
+          <span className="bg-blue-200 text-blue-900 text-[10px] sm:text-xs px-2 sm:px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider whitespace-nowrap">
             INSUFFICIENT DOCUMENTS
           </span>
         </div>

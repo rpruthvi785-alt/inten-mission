@@ -22,18 +22,23 @@ export const ItemGrid: React.FC<ItemGridProps> = ({
   }
 
   return (
-    <div className="bg-white rounded-lg border border-slate-200 shadow-sm overflow-hidden mt-6">
-      <div className="px-6 py-4 border-b border-slate-200 flex items-center justify-between">
-        <h3 className="text-base font-semibold text-slate-900">
-          Line Item Reconciliation ({items.length} SKUs)
-        </h3>
-        <span className="text-xs text-slate-500">
-          Reconciled across Purchase Order, Delivery & Fulfillment
+    <div className="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden mt-6">
+      <div className="px-4 sm:px-6 py-3.5 sm:py-4 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-1.5">
+        <div>
+          <h3 className="text-sm sm:text-base font-bold text-slate-900">
+            Line Item Reconciliation ({items.length} SKUs)
+          </h3>
+          <p className="text-[11px] sm:text-xs text-slate-500">
+            Reconciled across Purchase Order, Delivery & Fulfillment
+          </p>
+        </div>
+        <span className="text-[10px] sm:text-xs font-medium text-indigo-600 sm:text-slate-500 bg-indigo-50 sm:bg-transparent px-2 py-0.5 sm:p-0 rounded w-fit">
+          Swipe horizontally to view all metrics →
         </span>
       </div>
 
-      <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-slate-200 text-left text-xs">
+      <div className="overflow-x-auto w-full">
+        <table className="min-w-[860px] lg:min-w-full divide-y divide-slate-200 text-left text-xs">
           <thead className="bg-slate-50 font-semibold text-slate-700 uppercase tracking-wider">
             <tr>
               <th className="py-3 px-3">SKU Name</th>
